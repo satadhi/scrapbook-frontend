@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { useSelector } from 'react-redux';
 import Login from './component/Login';
+import Register from './component/Register';
 
 function App() {
 
@@ -11,7 +12,7 @@ function App() {
         <Routes>
           {/* <Route path="/" element={token ? <Home /> :  <Login /> } /> */}
           <Route path="/login" element={<Login />} />
-          {/* <Route path="/register" element={<Register />} /> */}
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
