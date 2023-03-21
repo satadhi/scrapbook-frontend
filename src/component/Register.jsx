@@ -1,4 +1,4 @@
-import React from 'react';
+import { React } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import locationOptions from '../resource/locationList';
@@ -14,8 +14,6 @@ function Register() {
         location: '',
         occupation: ''
     };
-
-    const [picture, setpicture] = useState('');
 
     const validationSchema = Yup.object().shape({
         firstName: Yup.string().required('First Name is required'),
@@ -34,25 +32,34 @@ function Register() {
     });
 
     const handleSubmit = async (values, { setSubmitting }) => {
-        console.log(values);
+
+
+        const formData = new FormData();
+        for (let value in values) {
+
+            console.log(values[value])
+            formData.append(value, values[value]);
+        }
+
+        formData.append("picturePath", "values.picture.name");
+
+
+        console.log(formData);
+
 
         try {
-            const response = await fetch('http://localhost:3001/auth/login', {
+            await fetch('http://localhost:3001/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(values),
+                body: formData
             })
 
             setSubmitting(false);
         } catch (e) {
             setSubmitting(true);
         }
-
-
-
-
     };
 
     return (
@@ -88,13 +95,11 @@ function Register() {
                         </div>
                         <div>
                             <label htmlFor="picture">Upload a picture:</label>
-                            <Field
-                                id="picture"
-                                name="picture"
+                            <input
                                 type="file"
                                 onChange={(event) => {
                                     console.log(event.currentTarget.files[0])
-                                    setFieldValue("picture", "satadhi");
+                                    setFieldValue("picture", event.currentTarget.files[0]);
                                 }}
                             />
                             <ErrorMessage name="picture" />
