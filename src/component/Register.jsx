@@ -1,133 +1,139 @@
-import { React } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import locationOptions from '../resource/locationList';
+import React, { useState } from 'react';
+import {
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  Button
+} from 'reactstrap';
 
-function Register() {
-    const initialValues = {
-        email: '',
-        password: '',
-        firstName: '',
-        lastName: '',
-        cpassword: '',
-        picture: '',
-        location: '',
-        occupation: ''
-    };
+const initialState = {
+  email: '',
+  password: '',
+  firstName: '',
+  lastName: '',
+  cpassword: '',
+  picture: null,
+  location: '',
+  occupation: ''
+};
 
-    const validationSchema = Yup.object().shape({
-        firstName: Yup.string().required('First Name is required'),
-        lastName: Yup.string().required('Last Name is required'),
-        email: Yup.string().email('Invalid email address').required('Email is required'),
-        password: Yup.string().required('Password is required').min(8, 'Password must be at least 8 characters long'),
-        cpassword: Yup.string().required('Please confirm your password').oneOf([Yup.ref('password'), null], 'Passwords must match'),
-        picture: Yup.mixed().test('fileType', 'Invalid file type, only JPEG, PNG, and GIF are allowed', (value) => {
-            if (value) {
-                return ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
-            }
-            return true;
-        }),
-        location: Yup.string().required('Location is required'),
-        occupation: Yup.string(),
-    });
+const Register = () => {
+  const [formState, setFormState] = useState(initialState);
 
-    const handleSubmit = async (values, { setSubmitting }) => {
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormState({ ...formState, [name]: value });
+  };
 
+  const handlePictureChange = (event) => {
+    const file = event.target.files[0];
+    setFormState({ ...formState, picture: file });
+  };
 
-        const formData = new FormData();
-        for (let value in values) {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(formState);
+    // TODO: submit form data to server
 
-            console.log(values[value])
-            formData.append(value, values[value]);
+    // this allows us to send form info with image
+    const formData = new FormData();
+    for (let value in formState) {
+      formData.append(value, formState[value]);
+    }
+    fetch(
+        "http://localhost:3001/auth/register",
+        {
+          method: "POST",
+          body: formData,
         }
+      );
+  };
 
-        formData.append("picturePath", "values.picture.name");
-
-
-        console.log(formData);
-
-
-        try {
-            await fetch('http://localhost:3001/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: formData
-            })
-
-            setSubmitting(false);
-        } catch (e) {
-            setSubmitting(true);
-        }
-    };
-
-    return (
-        <div>
-            <h1>Register</h1>
-            <Formik initialValues={initialValues} validationSchema={validationSchema}  enctype="multipart/form-data" onSubmit={handleSubmit}>
-                {({ value, isSubmitting, setFieldValue }) => (
-                    <Form>
-                        <div>
-                            <label htmlFor="firstName">firstName:</label>
-                            <Field type='text' name="firstName" id="firstName" />
-                            <ErrorMessage name="firstName" component="div" />
-                        </div>
-                        <div>
-                            <label htmlFor="lastName">lastName:</label>
-                            <Field type="text" name="lastName" id="lastName" />
-                            <ErrorMessage name="lastName" component="div" />
-                        </div>
-                        <div>
-                            <label htmlFor="email">email:</label>
-                            <Field type="email" name="email" id="email" />
-                            <ErrorMessage name="email" component="div" />
-                        </div>
-                        <div>
-                            <label htmlFor="password">Password:</label>
-                            <Field type="password" name="password" id="password" />
-                            <ErrorMessage name="password" component="div" />
-                        </div>
-                        <div>
-                            <label htmlFor="cpassword"> Confirm password:</label>
-                            <Field type="password" name="cpassword" id="cpassword" />
-                            <ErrorMessage name="cpassword" component="div" />
-                        </div>
-                        <div>
-                            <label htmlFor="picture">Upload a picture:</label>
-                            <input
-                                type="file"
-                                onChange={(event) => {
-                                    console.log(event.currentTarget.files[0])
-                                    setFieldValue("picture", event.currentTarget.files[0]);
-                                }}
-                            />
-                            <ErrorMessage name="picture" />
-                        </div>
-                        <div>
-                            <label htmlFor="location">Location:</label>
-                            <Field as="select" name="location">
-                                <option value="">Select a location</option>
-                                {locationOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Field>
-                            <ErrorMessage name="location" />
-                        </div>
-                        <div>
-                            <label htmlFor="occupation">occupation:</label>
-                            <Field type="text" name="occupation" id="occupation" />
-                            <ErrorMessage name="occupation" component="div" />
-                        </div>
-
-                        <button type="submit" disabled={isSubmitting}>Submit</button>
-                    </Form>
-                )}
-            </Formik>
-        </div>
-    );
-}
+  return (
+    <Form onSubmit={handleSubmit}>
+      <FormGroup>
+        <Label for="email">Email</Label>
+        <Input
+          type="email"
+          name="email"
+          id="email"
+          value={formState.email}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="password">Password</Label>
+        <Input
+          type="password"
+          name="password"
+          id="password"
+          value={formState.password}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="cpassword">Confirm Password</Label>
+        <Input
+          type="password"
+          name="cpassword"
+          id="cpassword"
+          value={formState.cpassword}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="firstName">First Name</Label>
+        <Input
+          type="text"
+          name="firstName"
+          id="firstName"
+          value={formState.firstName}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="lastName">Last Name</Label>
+        <Input
+          type="text"
+          name="lastName"
+          id="lastName"
+          value={formState.lastName}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="picture">Picture</Label>
+        <Input
+          type="file"
+          name="picture"
+          id="picture"
+          onChange={handlePictureChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="location">Location</Label>
+        <Input
+          type="text"
+          name="location"
+          id="location"
+          value={formState.location}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label for="occupation">Occupation</Label>
+        <Input
+          type="text"
+          name="occupation"
+          id="occupation"
+          value={formState.occupation}
+          onChange={handleInputChange}
+        />
+      </FormGroup>
+      <Button color="primary" type="submit">Submit</Button>
+    </Form>
+  );
+};
 
 export default Register;
