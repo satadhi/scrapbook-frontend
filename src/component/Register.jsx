@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import {
   Form,
   FormGroup,
@@ -21,6 +23,7 @@ const initialState = {
 const Register = () => {
   const [formState, setFormState] = useState(initialState);
 
+  const nav = useNavigate();
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormState({ ...formState, [name]: value });
@@ -42,12 +45,19 @@ const Register = () => {
       formData.append(value, formState[value]);
     }
     fetch(
-        "http://localhost:3001/auth/register",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      "http://localhost:3001/auth/register",
+      {
+        method: "POST",
+        body: formData,
+      }
+    ).then((res) => {
+      console.log(res);
+      if (res.status === 201) {
+        nav("/login");
+      }
+    }).catch((err) => {
+      console.log(err);
+    });
   };
 
   return (
