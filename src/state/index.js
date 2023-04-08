@@ -1,62 +1,63 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-
-    mode: 'dark',
-    user: null,
-    token: null,
-    posts: []
-}
+  mode: "dark",
+  user: null,
+  token: null,
+  posts: [],
+};
 
 const mainSlice = createSlice({
-    name: "main",
-    initialState,
-    reducers: {
+  name: "main",
+  initialState,
+  reducers: {
+    setLogin: (state, action) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+    },
 
-        setLogin: (state, action) => {
-            state.user = action.payload.user;
-            state.token = action.payload.token;
-        },
+    setLogout: (state) => {
+      state = initialState;
+    },
 
-        setLogout: (state) => {
-            state = initialState;
-        },
+    setAddFriend: (state, action) => {
+      if (state.user) state.user.friends = [...state.user.friends, action.payload.friend];
+    },
 
-        setAddFriend: (state, action) => {
+    setRemoveFriend: (state, action) => {
+      if (state.user) state.user.friends = state.user.friends.filter((ele) => ele._id !== action.payload.friendId);
+    },
 
-            if (state.user)
-                state.user.friends = [...state.user.friends, action.payload.friend];
-        },
+    setPosts: (state, action) => {
+      state.posts = action.payload.posts;
+    },
+    setCreatePost: (state, action) => {
+      state.posts = [...state.posts, action.payload.post];
+    },
 
-        setRemoveFriend: (state, action) => {
+    setUpdatePost: (state, action) => {
+      const updatedPosts = state.posts.map((post) =>
+        post._id === action.payload.post._id ? action.payload.post : post
+      );
+      state.posts = updatedPosts;
+    },
 
-            if (state.user)
-                state.user.friends =
-                    state.user.friends.filter(ele => ele._id !== action.payload.friendId);
-        },
+    setDeletePost: (state, action) => {
+      const updatedPosts = state.posts.map((post) =>
+        post._id === action.payload.post._id ? action.payload.post : post
+      );
+      state.posts = updatedPosts;
+    },
+  },
+});
 
-        setCreatePost: (state, action) => {
-            state.posts = [...state.posts, action.payload.post]
-        },
-
-        setUpdatePost: (state, action) => {
-            const updatedPosts = state.posts
-                .map(post => post._id === action.payload.post._id ? action.payload.post : post);
-            state.posts = updatedPosts;
-
-        },
-
-        setDeletePost: (state, action) => {
-            const updatedPosts = state.posts
-                .map(post => post._id === action.payload.post._id ? action.payload.post : post);
-            state.posts = updatedPosts;
-
-        }
-
-    }
-
-})
-
-
-export const {setLogin,setLogout, setAddFriend, setRemoveFriend, setCreatePost, setUpdatePost, setDeletePost}
- = mainSlice.actions;
-export default  mainSlice.reducer;
+export const {
+  setLogin,
+  setLogout,
+  setAddFriend,
+  setRemoveFriend,
+  setCreatePost,
+  setUpdatePost,
+  setDeletePost,
+  setPosts,
+} = mainSlice.actions;
+export default mainSlice.reducer;

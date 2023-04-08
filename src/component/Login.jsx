@@ -1,37 +1,35 @@
-import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../state";
 
 function Login() {
   const initialValues = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   };
 
   const nav = useNavigate();
   const dispatch = useDispatch();
 
-
   const validationSchema = Yup.object().shape({
-    email: Yup.string().email('Invalid email address').required('Email is required'),
-    password: Yup.string().required('Password is required'),
+    email: Yup.string().email("Invalid email address").required("Email is required"),
+    password: Yup.string().required("Password is required"),
   });
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch('http://localhost:3001/auth/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3001/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      })
+      });
 
       const loggedIn = await response.json();
-      console.log(loggedIn)
       if (loggedIn) {
         dispatch(
           setLogin({
@@ -46,10 +44,6 @@ function Login() {
     } catch (e) {
       setSubmitting(true);
     }
-
-
-
-
   };
 
   return (
@@ -68,7 +62,9 @@ function Login() {
               <Field type="password" name="password" id="password" />
               <ErrorMessage name="password" component="div" />
             </div>
-            <button type="submit" disabled={isSubmitting}>Submit</button>
+            <button type="submit" disabled={isSubmitting}>
+              Submit
+            </button>
           </Form>
         )}
       </Formik>
