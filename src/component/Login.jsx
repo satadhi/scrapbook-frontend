@@ -1,32 +1,41 @@
-import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+// import React from "react";
+// import { Formik, Form, Field, ErrorMessage } from "formik";
+// import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "../state";
 
-function Login() {
-  const initialValues = {
-    email: "",
-    password: "",
-  };
 
-  const nav = useNavigate();
+import * as React from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+
+const theme = createTheme();
+
+export default function Login() {
+
   const dispatch = useDispatch();
-
-  const validationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email address").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
-
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const nav = useNavigate ();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
     try {
       const response = await fetch("http://localhost:3001/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(data),
       });
 
       const loggedIn = await response.json();
@@ -40,36 +49,69 @@ function Login() {
         nav("/home");
       }
 
-      setSubmitting(false);
     } catch (e) {
-      setSubmitting(true);
+
     }
   };
 
+
   return (
-    <div>
-      <h1>Login</h1>
-      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-        {({ isSubmitting }) => (
-          <Form>
-            <div>
-              <label htmlFor="email">Email:</label>
-              <Field type="email" name="email" id="email" />
-              <ErrorMessage name="email" component="div" />
-            </div>
-            <div>
-              <label htmlFor="password">Password:</label>
-              <Field type="password" name="password" id="password" />
-              <ErrorMessage name="password" component="div" />
-            </div>
-            <button type="submit" disabled={isSubmitting}>
-              Submit
-            </button>
-          </Form>
-        )}
-      </Formik>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign in
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign In
+            </Button>
+            <Grid container>
+              <Grid item>
+                <Link href="/register" variant="body2">
+                  {"Don't have an account? Sign Up"}
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+      </Container>
+    </ThemeProvider>
   );
 }
-
-export default Login;

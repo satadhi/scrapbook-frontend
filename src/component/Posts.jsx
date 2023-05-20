@@ -21,10 +21,12 @@ function Posts() {
     fetchData();
   }, []);
 
+  console.log(posts)
+
   return (
     <div>
       {posts.map((post) => (
-        <Post content={post.description} initialLikes={Object.keys(post.likes).length} />
+        <Post content={post?.description} initialLikes={Object.keys(post?.likes).length} />
       ))}
     </div>
   );
